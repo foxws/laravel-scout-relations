@@ -37,6 +37,11 @@ trait HasSearchableRelations
         });
     }
 
+    public static function flushSyncingState(): void
+    {
+        static::$syncing = [];
+    }
+
     public function shouldReindexSearchableRelations(): bool
     {
         return true;
