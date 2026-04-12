@@ -16,7 +16,7 @@ trait HasSearchableRelations
      *
      * @var array<class-string, bool>
      */
-    private static array $reindexing = [];
+    protected static array $reindexing = [];
 
     public static function bootHasSearchableRelations(): void
     {
