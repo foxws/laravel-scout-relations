@@ -4,6 +4,7 @@ namespace Foxws\ScoutRelations\Tests;
 
 use Foxws\ScoutRelations\ScoutRelationsServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Laravel\Scout\ScoutServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
@@ -20,7 +21,7 @@ class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
-            \Laravel\Scout\ScoutServiceProvider::class,
+            ScoutServiceProvider::class,
             ScoutRelationsServiceProvider::class,
         ];
     }

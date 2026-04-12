@@ -6,7 +6,7 @@ use Foxws\ScoutRelations\Concerns\HasSearchableRelations;
 use Foxws\ScoutRelations\Tests\Fixtures\Author;
 use Foxws\ScoutRelations\Tests\Fixtures\Comment;
 use Foxws\ScoutRelations\Tests\Fixtures\CommentAuthor;
-use Foxws\ScoutRelations\Tests\Fixtures\Post;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
@@ -39,7 +39,8 @@ afterEach(function () {
 });
 
 it('returns empty searchable relations by default', function () {
-    $model = new class extends \Illuminate\Database\Eloquent\Model {
+    $model = new class extends Model
+    {
         use HasSearchableRelations;
     };
 
