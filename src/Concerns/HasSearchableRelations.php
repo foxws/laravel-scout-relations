@@ -25,12 +25,21 @@ trait HasSearchableRelations
         }
 
         static::saved(function (Model $model): void {
-            if ($model->wasChanged()) {
+            if ($model->wasChanged() && $model->shouldReindexSearchableRelations()) {
                 $model->reindexSearchableRelations();
             }
         });
 
-        static::deleted(fn (Model $model) => $model->reindexSearchableRelations());
+        static::deleted(function (Model $model): void {
+            if ($model->shouldReindexSearchableRelations()) {
+                $model->reindexSearchableRelations();
+            }
+        });
+    }
+
+    public function shouldReindexSearchableRelations(): bool
+    {
+        return true;
     }
 
     public function reindexSearchableRelations(): void
