@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Domain\Shared\Concerns;
+namespace Foxws\ScoutRelations\Concerns;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;

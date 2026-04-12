@@ -1,60 +1,91 @@
-# Automatically re-index Scout-searchable related models when an Eloquent model is s
+# Laravel Scout Relations
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/foxws/laravel-scout-relations.svg?style=flat-square)](https://packagist.org/packages/foxws/laravel-scout-relations)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/foxws/laravel-scout-relations/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/foxws/laravel-scout-relations/actions?query=workflow%3Arun-tests+branch%3Amain)
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/foxws/laravel-scout-relations/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/foxws/laravel-scout-relations/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/foxws/laravel-scout-relations.svg?style=flat-square)](https://packagist.org/packages/foxws/laravel-scout-relations)
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+Automatically re-index Scout-searchable related models when an Eloquent model is saved or deleted.
 
-## Support us
+When a parent model changes (e.g. an `Author`), its related Searchable models (e.g. `Post`) are automatically queued for re-indexing, keeping your search index consistent without any manual intervention.
 
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/laravel-scout-relations.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/laravel-scout-relations)
+## Requirements
 
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+- PHP 8.4+
+- Laravel 11 or 12
+- [Laravel Scout](https://laravel.com/docs/scout)
 
 ## Installation
 
-You can install the package via composer:
+Install the package via Composer:
 
 ```bash
 composer require foxws/laravel-scout-relations
 ```
 
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="laravel-scout-relations-migrations"
-php artisan migrate
-```
-
-You can publish the config file with:
-
-```bash
-php artisan vendor:publish --tag="laravel-scout-relations-config"
-```
-
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
-
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="laravel-scout-relations-views"
-```
-
 ## Usage
 
+Add the `HasSearchableRelations` trait to any Eloquent model whose changes should trigger re-indexing of related models. Then override `searchableRelations()` to return the relationship names to watch.
+
 ```php
-$scoutRelations = new Foxws\ScoutRelations();
-echo $scoutRelations->echoPhrase('Hello, Foxws!');
+use Foxws\ScoutRelations\Concerns\HasSearchableRelations;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class Author extends Model
+{
+    use HasSearchableRelations;
+
+    /**
+     * Relationships whose models should be re-indexed when this model changes.
+     *
+     * @return array<int, string>
+     */
+    public function searchableRelations(): array
+    {
+        return ['posts'];
+    }
+
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class);
+    }
+}
 ```
+
+The related `Post` model must use Laravel Scout's `Searchable` trait:
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
+
+class Post extends Model
+{
+    use Searchable;
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'id'          => $this->id,
+            'title'       => $this->title,
+            'author_name' => $this->author->name, // kept fresh on every re-index
+        ];
+    }
+}
+```
+
+Now whenever an `Author` is saved with changes or deleted, all of its `Post` records are automatically re-indexed.
+
+## How it works
+
+The trait hooks into Eloquent's `saved` and `deleted` model events:
+
+- **`saved`** — re-indexes relations only when `wasChanged()` is `true`, avoiding unnecessary indexing on no-op saves.
+- **`deleted`** — re-indexes relations unconditionally so the search index reflects the parent's removal.
+
+Re-indexing is performed in chunks (default `500`, respects `scout.chunk.searchable`) via `chunkById`. If the related model defines `makeAllSearchableUsing()`, it is applied to the chunk query, preventing N+1 queries.
+
+A per-class re-entry guard (`$syncing`) prevents infinite cascades when mutual relationships exist.
 
 ## Testing
 
