@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Foxws\ScoutRelations;
 
 use Foxws\ScoutRelations\Commands\ScoutRelationsCommand;
@@ -18,8 +20,6 @@ class ScoutRelationsServiceProvider extends PackageServiceProvider
         $package
             ->name('laravel-scout-relations')
             ->hasConfigFile()
-            ->hasViews()
-            ->hasMigration('create_laravel_scout_relations_table')
             ->hasCommand(ScoutRelationsCommand::class);
     }
 }
