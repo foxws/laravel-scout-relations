@@ -31,6 +31,10 @@ trait HasSearchableRelations
 
     protected function reindexSearchableRelations(): void
     {
+        if (! Config::boolean('scout-relations.enabled', true)) {
+            return;
+        }
+
         $class = static::class;
 
         if (array_key_exists($class, static::$syncing)) {
@@ -83,6 +87,8 @@ trait HasSearchableRelations
             )($query->getQuery());
         }
 
-        $query->chunkById(Config::integer('scout.chunk.searchable', 500), fn ($chunk) => $chunk->searchable());
+        $chunkSize = Config::integer('scout-relations.chunk.searchable', 500);
+
+        $query->chunkById($chunkSize, fn ($chunk) => $chunk->searchable());
     }
 }

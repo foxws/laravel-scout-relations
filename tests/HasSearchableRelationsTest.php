@@ -51,7 +51,7 @@ it('reindexes related models when saved with changes', function () {
     config(['scout.queue' => true]);
     Queue::fake();
 
-    $authorId = DB::table('authors')->insertGetId(['created_at' => now(), 'updated_at' => now()]);
+    $authorId = DB::table('authors')->insertGetId(['created_at' => now()->subMinute(), 'updated_at' => now()->subMinute()]);
     DB::table('posts')->insert(['author_id' => $authorId, 'created_at' => now(), 'updated_at' => now()]);
 
     Author::find($authorId)->touch();
