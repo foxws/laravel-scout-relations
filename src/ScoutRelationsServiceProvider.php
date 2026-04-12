@@ -2,9 +2,9 @@
 
 namespace Foxws\ScoutRelations;
 
+use Foxws\ScoutRelations\Commands\ScoutRelationsCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Foxws\ScoutRelations\Commands\ScoutRelationsCommand;
 
 class ScoutRelationsServiceProvider extends PackageServiceProvider
 {

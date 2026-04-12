@@ -2,9 +2,9 @@
 
 namespace Foxws\ScoutRelations\Tests;
 
+use Foxws\ScoutRelations\ScoutRelationsServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Foxws\ScoutRelations\ScoutRelationsServiceProvider;
 
 class TestCase extends Orchestra
 {
