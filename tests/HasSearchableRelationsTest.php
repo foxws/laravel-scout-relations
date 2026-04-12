@@ -159,7 +159,8 @@ it('respects shouldReindexSearchableRelations override', function () {
     config(['scout-relations.enabled' => false]);
 
     // Boot has already run for Author, so re-test via a fresh anonymous model class.
-    $model = new class extends Model {
+    $model = new class extends Model
+    {
         use HasSearchableRelations;
     };
     expect($model->shouldReindexSearchableRelations())->toBeTrue();
