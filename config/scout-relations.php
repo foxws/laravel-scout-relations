@@ -1,6 +1,5 @@
 <?php
 
-// config for Foxws/ScoutRelations
 return [
 
     /*
@@ -13,7 +12,7 @@ return [
     |
     */
 
-    'enabled' => env('SCOUT_RELATIONS_ENABLED', true),
+    'enabled' => (bool) env('SCOUT_RELATIONS_ENABLED', true),
 
     /*
     |--------------------------------------------------------------------------
@@ -27,8 +26,8 @@ return [
     */
 
     'chunk' => [
-        'searchable' => env('SCOUT_RELATIONS_CHUNK_SEARCHABLE', 500),
-        'unsearchable' => env('SCOUT_RELATIONS_CHUNK_UNSEARCHABLE', 500),
+        'searchable' => (int) env('SCOUT_RELATIONS_CHUNK_SEARCHABLE', 500),
+        'unsearchable' => (int) env('SCOUT_RELATIONS_CHUNK_UNSEARCHABLE', 500),
     ],
 
 ];
