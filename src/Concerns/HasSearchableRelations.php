@@ -20,6 +20,10 @@ trait HasSearchableRelations
 
     public static function bootHasSearchableRelations(): void
     {
+        if (! Config::boolean('scout-relations.enabled', true)) {
+            return;
+        }
+
         static::saved(function (Model $model): void {
             if ($model->wasChanged()) {
                 $model->reindexSearchableRelations();
@@ -29,12 +33,8 @@ trait HasSearchableRelations
         static::deleted(fn (Model $model) => $model->reindexSearchableRelations());
     }
 
-    protected function reindexSearchableRelations(): void
+    public function reindexSearchableRelations(): void
     {
-        if (! Config::boolean('scout-relations.enabled', true)) {
-            return;
-        }
-
         $class = static::class;
 
         if (array_key_exists($class, static::$syncing)) {
