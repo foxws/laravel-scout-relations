@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Foxws\ScoutRelations\Facades;
 
 use Illuminate\Support\Facades\Facade;
