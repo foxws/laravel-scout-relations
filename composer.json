@@ -1,6 +1,6 @@
 {
     "name": "foxws/laravel-scout-relations",
-    "description": "Automatically re-index Scout-searchable related models when an Eloquent model is s",
+    "description": "Automatically re-index Scout-searchable related models.",
     "keywords": [
         "Foxws",
         "laravel",
