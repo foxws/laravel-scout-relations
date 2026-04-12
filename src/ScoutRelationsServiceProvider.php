@@ -32,7 +32,7 @@ class ScoutRelationsServiceProvider extends PackageServiceProvider
             /** @phpstan-ignore-next-line */
             Octane::listen(
                 RequestReceived::class,
-                fn () => HasSearchableRelations::flushSyncingState(),
+                fn () => HasSearchableRelations::flushReindexingState(),
             );
         });
     }

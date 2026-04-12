@@ -109,16 +109,16 @@ it('skips relations whose related model does not use Searchable', function () {
     Queue::assertNothingPushed();
 });
 
-it('prevents recursive reindexing via syncing guard', function () {
+it('prevents recursive reindexing via reindexing guard', function () {
     config(['scout.queue' => true]);
     Queue::fake();
 
     $authorId = DB::table('authors')->insertGetId(['created_at' => now(), 'updated_at' => now()]);
     DB::table('posts')->insert(['author_id' => $authorId, 'created_at' => now(), 'updated_at' => now()]);
 
-    // Simulate mid-cascade re-entry by pre-setting the syncing flag via reflection
+    // Simulate mid-cascade re-entry by pre-setting the reindexing flag via reflection
     $reflection = new ReflectionClass(Author::class);
-    $property = $reflection->getProperty('syncing');
+    $property = $reflection->getProperty('reindexing');
     $property->setValue(null, [Author::class => true]);
 
     Author::find($authorId)->touch();

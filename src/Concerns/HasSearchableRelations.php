@@ -16,7 +16,7 @@ trait HasSearchableRelations
      *
      * @var array<class-string, bool>
      */
-    private static array $syncing = [];
+    private static array $reindexing = [];
 
     public static function bootHasSearchableRelations(): void
     {
@@ -37,9 +37,9 @@ trait HasSearchableRelations
         });
     }
 
-    public static function flushSyncingState(): void
+    public static function flushReindexingState(): void
     {
-        static::$syncing = [];
+        static::$reindexing = [];
     }
 
     public function shouldReindexSearchableRelations(): bool
@@ -51,18 +51,18 @@ trait HasSearchableRelations
     {
         $class = static::class;
 
-        if (array_key_exists($class, static::$syncing)) {
+        if (array_key_exists($class, static::$reindexing)) {
             return;
         }
 
-        static::$syncing[$class] = true;
+        static::$reindexing[$class] = true;
 
         try {
             foreach ($this->searchableRelations() as $relation) {
                 $this->reindexSearchableRelation($relation);
             }
         } finally {
-            unset(static::$syncing[$class]);
+            unset(static::$reindexing[$class]);
         }
     }
 
