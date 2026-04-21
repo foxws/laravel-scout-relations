@@ -120,12 +120,14 @@ it('prevents recursive reindexing via reindexing guard', function () {
     // Simulate mid-cascade re-entry by marking Author as already reindexing
     app(SearchableRelationsState::class)->markReindexing(Author::class);
 
-    Author::find($authorId)->touch();
+    try {
+        Author::find($authorId)->touch();
 
-    // Guard blocked execution — no jobs should have been dispatched
-    Queue::assertNothingPushed();
-
-    app()->forgetInstance(SearchableRelationsState::class);
+        // Guard blocked execution — no jobs should have been dispatched
+        Queue::assertNothingPushed();
+    } finally {
+        app()->forgetInstance(SearchableRelationsState::class);
+    }
 });
 
 it('does not register model event listeners when disabled', function () {
