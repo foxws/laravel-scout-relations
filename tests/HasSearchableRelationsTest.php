@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Foxws\ScoutRelations\Concerns\HasSearchableRelations;
+use Foxws\ScoutRelations\Support\SearchableRelationsState;
 use Foxws\ScoutRelations\Tests\Fixtures\Author;
 use Foxws\ScoutRelations\Tests\Fixtures\Comment;
 use Foxws\ScoutRelations\Tests\Fixtures\CommentAuthor;
@@ -116,18 +117,15 @@ it('prevents recursive reindexing via reindexing guard', function () {
     $authorId = DB::table('authors')->insertGetId(['created_at' => now(), 'updated_at' => now()]);
     DB::table('posts')->insert(['author_id' => $authorId, 'created_at' => now(), 'updated_at' => now()]);
 
-    // Simulate mid-cascade re-entry by pre-setting the reindexing flag via reflection
-    $reflection = new ReflectionClass(Author::class);
-    $property = $reflection->getProperty('reindexing');
-    $property->setValue(null, [Author::class => true]);
+    // Simulate mid-cascade re-entry by marking Author as already reindexing
+    SearchableRelationsState::markReindexing(Author::class);
 
     Author::find($authorId)->touch();
 
     // Guard blocked execution — no jobs should have been dispatched
     Queue::assertNothingPushed();
 
-    // Restore state for other tests
-    $property->setValue(null, []);
+    SearchableRelationsState::flushReindexingState();
 });
 
 it('does not register model event listeners when disabled', function () {

@@ -5,19 +5,13 @@ declare(strict_types=1);
 namespace Foxws\ScoutRelations\Concerns;
 
 use Closure;
+use Foxws\ScoutRelations\Support\SearchableRelationsState;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
 use Laravel\Scout\Searchable;
 
 trait HasSearchableRelations
 {
-    /**
-     * Tracks which model classes are currently mid-cascade to prevent re-entry.
-     *
-     * @var array<class-string, bool>
-     */
-    protected static array $reindexing = [];
-
     public static function bootHasSearchableRelations(): void
     {
         if (! Config::boolean('scout-relations.enabled', true)) {
@@ -37,11 +31,6 @@ trait HasSearchableRelations
         });
     }
 
-    public static function flushReindexingState(): void
-    {
-        static::$reindexing = [];
-    }
-
     public function shouldReindexSearchableRelations(): bool
     {
         return true;
@@ -51,18 +40,18 @@ trait HasSearchableRelations
     {
         $class = static::class;
 
-        if (array_key_exists($class, static::$reindexing)) {
+        if (SearchableRelationsState::isReindexing($class)) {
             return;
         }
 
-        static::$reindexing[$class] = true;
+        SearchableRelationsState::markReindexing($class);
 
         try {
             foreach ($this->searchableRelations() as $relation) {
                 $this->reindexSearchableRelation($relation);
             }
         } finally {
-            unset(static::$reindexing[$class]);
+            SearchableRelationsState::unmarkReindexing($class);
         }
     }
 

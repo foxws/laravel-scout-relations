@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Foxws\ScoutRelations;
 
 use Foxws\ScoutRelations\Commands\ScoutRelationsCommand;
-use Foxws\ScoutRelations\Concerns\HasSearchableRelations;
+use Foxws\ScoutRelations\Support\SearchableRelationsState;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -29,7 +29,7 @@ class ScoutRelationsServiceProvider extends PackageServiceProvider
         $this->callAfterResolving('octane', function (): void {
             $this->app['events']->listen(
                 'Laravel\Octane\Events\RequestReceived',
-                fn () => HasSearchableRelations::flushReindexingState(),
+                fn () => SearchableRelationsState::flushReindexingState(),
             );
         });
     }
