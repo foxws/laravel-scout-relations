@@ -26,10 +26,12 @@ class ScoutRelationsServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
+        $this->app->singleton(SearchableRelationsState::class);
+
         $this->callAfterResolving('octane', function (): void {
             $this->app['events']->listen(
                 'Laravel\Octane\Events\RequestReceived',
-                fn () => SearchableRelationsState::flushReindexingState(),
+                fn () => $this->app->forgetInstance(SearchableRelationsState::class),
             );
         });
     }

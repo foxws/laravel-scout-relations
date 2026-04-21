@@ -38,20 +38,22 @@ trait HasSearchableRelations
 
     public function reindexSearchableRelations(): void
     {
+        $state = app(SearchableRelationsState::class);
+
         $class = static::class;
 
-        if (SearchableRelationsState::isReindexing($class)) {
+        if ($state->isReindexing($class)) {
             return;
         }
 
-        SearchableRelationsState::markReindexing($class);
+        $state->markReindexing($class);
 
         try {
             foreach ($this->searchableRelations() as $relation) {
                 $this->reindexSearchableRelation($relation);
             }
         } finally {
-            SearchableRelationsState::unmarkReindexing($class);
+            $state->unmarkReindexing($class);
         }
     }
 

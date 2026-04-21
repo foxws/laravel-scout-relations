@@ -4,44 +4,52 @@ declare(strict_types=1);
 
 use Foxws\ScoutRelations\Support\SearchableRelationsState;
 
-afterEach(function () {
-    SearchableRelationsState::flushReindexingState();
-});
+// Each test gets a fresh singleton instance via the Orchestra test application boot.
 
 it('reports a class as not reindexing by default', function () {
-    expect(SearchableRelationsState::isReindexing('App\Models\Post'))->toBeFalse();
+    $state = app(SearchableRelationsState::class);
+
+    expect($state->isReindexing('App\Models\Post'))->toBeFalse();
 });
 
 it('reports a class as reindexing after marking it', function () {
-    SearchableRelationsState::markReindexing('App\Models\Post');
+    $state = app(SearchableRelationsState::class);
+    $state->markReindexing('App\Models\Post');
 
-    expect(SearchableRelationsState::isReindexing('App\Models\Post'))->toBeTrue();
+    expect($state->isReindexing('App\Models\Post'))->toBeTrue();
 });
 
 it('does not affect other classes when marking one', function () {
-    SearchableRelationsState::markReindexing('App\Models\Post');
+    $state = app(SearchableRelationsState::class);
+    $state->markReindexing('App\Models\Post');
 
-    expect(SearchableRelationsState::isReindexing('App\Models\Author'))->toBeFalse();
+    expect($state->isReindexing('App\Models\Author'))->toBeFalse();
 });
 
 it('reports a class as not reindexing after unmarking it', function () {
-    SearchableRelationsState::markReindexing('App\Models\Post');
-    SearchableRelationsState::unmarkReindexing('App\Models\Post');
+    $state = app(SearchableRelationsState::class);
+    $state->markReindexing('App\Models\Post');
+    $state->unmarkReindexing('App\Models\Post');
 
-    expect(SearchableRelationsState::isReindexing('App\Models\Post'))->toBeFalse();
+    expect($state->isReindexing('App\Models\Post'))->toBeFalse();
 });
 
-it('clears all tracked classes on flush', function () {
-    SearchableRelationsState::markReindexing('App\Models\Post');
-    SearchableRelationsState::markReindexing('App\Models\Author');
+it('clears all tracked classes when the singleton is refreshed', function () {
+    $state = app(SearchableRelationsState::class);
+    $state->markReindexing('App\Models\Post');
+    $state->markReindexing('App\Models\Author');
 
-    SearchableRelationsState::flushReindexingState();
+    // Simulate Octane request boundary
+    app()->forgetInstance(SearchableRelationsState::class);
+    $fresh = app(SearchableRelationsState::class);
 
-    expect(SearchableRelationsState::isReindexing('App\Models\Post'))->toBeFalse()
-        ->and(SearchableRelationsState::isReindexing('App\Models\Author'))->toBeFalse();
+    expect($fresh->isReindexing('App\Models\Post'))->toBeFalse()
+        ->and($fresh->isReindexing('App\Models\Author'))->toBeFalse();
 });
 
 it('unmark is a no-op for a class that was never marked', function () {
-    expect(fn () => SearchableRelationsState::unmarkReindexing('App\Models\Post'))->not->toThrow(Throwable::class);
-    expect(SearchableRelationsState::isReindexing('App\Models\Post'))->toBeFalse();
+    $state = app(SearchableRelationsState::class);
+
+    expect(fn () => $state->unmarkReindexing('App\Models\Post'))->not->toThrow(Throwable::class);
+    expect($state->isReindexing('App\Models\Post'))->toBeFalse();
 });

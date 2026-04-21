@@ -11,25 +11,20 @@ class SearchableRelationsState
      *
      * @var array<class-string, bool>
      */
-    private static array $reindexing = [];
+    private array $reindexing = [];
 
-    public static function isReindexing(string $class): bool
+    public function isReindexing(string $class): bool
     {
-        return array_key_exists($class, self::$reindexing);
+        return array_key_exists($class, $this->reindexing);
     }
 
-    public static function markReindexing(string $class): void
+    public function markReindexing(string $class): void
     {
-        self::$reindexing[$class] = true;
+        $this->reindexing[$class] = true;
     }
 
-    public static function unmarkReindexing(string $class): void
+    public function unmarkReindexing(string $class): void
     {
-        unset(self::$reindexing[$class]);
-    }
-
-    public static function flushReindexingState(): void
-    {
-        self::$reindexing = [];
+        unset($this->reindexing[$class]);
     }
 }

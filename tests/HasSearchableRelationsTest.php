@@ -118,14 +118,14 @@ it('prevents recursive reindexing via reindexing guard', function () {
     DB::table('posts')->insert(['author_id' => $authorId, 'created_at' => now(), 'updated_at' => now()]);
 
     // Simulate mid-cascade re-entry by marking Author as already reindexing
-    SearchableRelationsState::markReindexing(Author::class);
+    app(SearchableRelationsState::class)->markReindexing(Author::class);
 
     Author::find($authorId)->touch();
 
     // Guard blocked execution — no jobs should have been dispatched
     Queue::assertNothingPushed();
 
-    SearchableRelationsState::flushReindexingState();
+    app()->forgetInstance(SearchableRelationsState::class);
 });
 
 it('does not register model event listeners when disabled', function () {
