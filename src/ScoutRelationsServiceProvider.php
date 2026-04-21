@@ -30,7 +30,7 @@ class ScoutRelationsServiceProvider extends PackageServiceProvider
 
         $this->callAfterResolving('octane', function (): void {
             $this->app['events']->listen(
-                'Laravel\Octane\Events\RequestReceived',
+                'Laravel\Octane\Events\RequestTerminated',
                 fn () => $this->app->forgetInstance(SearchableRelationsState::class),
             );
         });
