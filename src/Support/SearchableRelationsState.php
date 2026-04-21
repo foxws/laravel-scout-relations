@@ -15,21 +15,21 @@ class SearchableRelationsState
 
     public static function isReindexing(string $class): bool
     {
-        return array_key_exists($class, static::$reindexing);
+        return array_key_exists($class, self::$reindexing);
     }
 
     public static function markReindexing(string $class): void
     {
-        static::$reindexing[$class] = true;
+        self::$reindexing[$class] = true;
     }
 
     public static function unmarkReindexing(string $class): void
     {
-        unset(static::$reindexing[$class]);
+        unset(self::$reindexing[$class]);
     }
 
     public static function flushReindexingState(): void
     {
-        static::$reindexing = [];
+        self::$reindexing = [];
     }
 }
