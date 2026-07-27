@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Foxws\ScoutRelations\Tests\Fixtures\Author;
 use Foxws\ScoutRelations\Tests\Fixtures\Post;
+use Foxws\ScoutRelations\Tests\Fixtures\TaggedAuthor;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
@@ -21,9 +22,21 @@ beforeEach(function () {
         $table->unsignedBigInteger('author_id');
         $table->timestamps();
     });
+
+    Schema::create('tags', function (Blueprint $table) {
+        $table->id();
+        $table->timestamps();
+    });
+
+    Schema::create('author_tag', function (Blueprint $table) {
+        $table->unsignedBigInteger('author_id');
+        $table->unsignedBigInteger('tag_id');
+    });
 });
 
 afterEach(function () {
+    Schema::dropIfExists('author_tag');
+    Schema::dropIfExists('tags');
     Schema::dropIfExists('posts');
     Schema::dropIfExists('authors');
 });
@@ -59,4 +72,25 @@ it('succeeds with no records and dispatches no jobs', function () {
         ->assertSuccessful();
 
     Queue::assertNothingPushed();
+});
+
+it('re-indexes a shared many-to-many relation only once across owning records', function () {
+    config(['scout.queue' => true]);
+    Queue::fake();
+
+    $firstAuthorId = DB::table('authors')->insertGetId(['created_at' => now(), 'updated_at' => now()]);
+    $secondAuthorId = DB::table('authors')->insertGetId(['created_at' => now(), 'updated_at' => now()]);
+    $tagId = DB::table('tags')->insertGetId(['created_at' => now(), 'updated_at' => now()]);
+
+    DB::table('author_tag')->insert([
+        ['author_id' => $firstAuthorId, 'tag_id' => $tagId],
+        ['author_id' => $secondAuthorId, 'tag_id' => $tagId],
+    ]);
+
+    $this->artisan('scout:index-relations', ['model' => TaggedAuthor::class])
+        ->assertSuccessful();
+
+    // The tag is attached to two authors, but re-indexing dedupes by
+    // related class, so it must only be pushed to the search engine once.
+    Queue::assertPushed(MakeSearchable::class, 1);
 });

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Foxws\ScoutRelations\Support\SearchableRelationsState;
 
-// Each test gets a fresh singleton instance via the Orchestra test application boot.
+// Each test gets a fresh scoped instance via the Orchestra test application boot.
 
 it('reports a class as not reindexing by default', function () {
     $state = app(SearchableRelationsState::class);
@@ -34,7 +34,7 @@ it('reports a class as not reindexing after unmarking it', function () {
     expect($state->isReindexing('App\Models\Post'))->toBeFalse();
 });
 
-it('clears all tracked classes when the singleton is refreshed', function () {
+it('clears all tracked classes when the scoped instance is refreshed', function () {
     $state = app(SearchableRelationsState::class);
     $state->markReindexing('App\Models\Post');
     $state->markReindexing('App\Models\Author');
