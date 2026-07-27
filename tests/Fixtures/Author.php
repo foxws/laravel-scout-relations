@@ -6,6 +6,7 @@ namespace Foxws\ScoutRelations\Tests\Fixtures;
 
 use Foxws\ScoutRelations\Concerns\HasSearchableRelations;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Author extends Model
@@ -27,5 +28,10 @@ class Author extends Model
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
+    }
+
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class, 'author_tag', 'author_id', 'tag_id');
     }
 }

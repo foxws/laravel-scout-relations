@@ -7,6 +7,7 @@ namespace Foxws\ScoutRelations\Commands;
 use Foxws\ScoutRelations\Concerns\HasSearchableRelations;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;
+use Laravel\Scout\Searchable;
 
 class ScoutRelationsCommand extends Command
 {
@@ -30,26 +31,52 @@ class ScoutRelationsCommand extends Command
             return self::FAILURE;
         }
 
-        $instance = new $model;
+        $relatedClasses = $this->searchableRelatedClasses(new $model);
+
+        if ($relatedClasses === []) {
+            $this->components->info("No searchable relations found for [{$model}].");
+
+            return self::SUCCESS;
+        }
+
         $chunkSize = Config::integer('scout-relations.chunk.searchable', 500);
-        $total = $instance->newQuery()->count();
 
-        $this->info("Re-indexing relations for [{$model}] ({$total} records)...");
+        foreach ($relatedClasses as $relatedClass) {
+            $this->components->task("Re-indexing [{$relatedClass}]", function () use ($relatedClass, $chunkSize): void {
+                $relatedClass::makeAllSearchable($chunkSize);
+            });
+        }
 
-        $bar = $this->output->createProgressBar($total);
-        $bar->start();
-
-        $instance->newQuery()->chunkById($chunkSize, function ($models) use ($bar): void {
-            foreach ($models as $record) {
-                $record->reindexSearchableRelations();
-                $bar->advance();
-            }
-        });
-
-        $bar->finish();
-        $this->newLine();
-        $this->info('Done.');
+        $this->components->info('Done.');
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Resolve the distinct, searchable related model classes referenced by the
+     * given model's searchable relations.
+     *
+     * Re-indexing is performed once per related class (via the class's own
+     * full-table Scout import) rather than once per owning record, so a
+     * relation shared across many parents (e.g. belongsToMany) isn't pushed
+     * to the search engine more than once per bulk run.
+     *
+     * @return array<int, class-string>
+     */
+    protected function searchableRelatedClasses(object $instance): array
+    {
+        $classes = [];
+
+        foreach ($instance->searchableRelations() as $relation) {
+            $related = $instance->{$relation}()->getRelated();
+
+            if (! in_array(Searchable::class, class_uses_recursive($related))) {
+                continue;
+            }
+
+            $classes[get_class($related)] = true;
+        }
+
+        return array_keys($classes);
     }
 }
