@@ -42,7 +42,7 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          editUrl: 'https://github.com/foxws/laravel-scout-relations/edit/main/website/',
+          editUrl: 'https://github.com/foxws/laravel-scout-relations/edit/main/docs/',
         },
         blog: false,
         theme: {
