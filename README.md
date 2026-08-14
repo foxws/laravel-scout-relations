@@ -9,6 +9,8 @@ Automatically re-index Scout-searchable related models when an Eloquent model is
 
 When a parent model changes (e.g. an `Author`), its related Searchable models (e.g. `Post`) are automatically queued for re-indexing, keeping your search index consistent without any manual intervention.
 
+Full documentation is available at [foxws.github.io/laravel-scout-relations](https://foxws.github.io/laravel-scout-relations/).
+
 ## Requirements
 
 - PHP 8.4+
