@@ -1,15 +1,18 @@
 ---
-sidebar_position: 5
+section: Usage
+order: 2
 ---
 
 # Artisan command
 
-To manually force re-indexing of all relations for a model (ignoring the
-`enabled` flag), use:
+Use this command to manually re-index every related record for all
+instances of a model. This works even if automatic syncing is turned off
+with the `enabled` config option.
 
 ```bash
 php artisan scout:index-relations "App\Models\Author"
 ```
 
-This chunks through every record of the given model and calls
-`reindexSearchableRelations()` on each, with a progress bar.
+This command goes through every record of the given model in chunks, calls
+`reindexSearchableRelations()` on each one, and shows a progress bar while it
+runs.

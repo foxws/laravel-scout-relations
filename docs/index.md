@@ -1,16 +1,23 @@
 ---
-slug: /
-sidebar_position: 1
+title: Introduction
+metadata:
+  role: Search
+  eyebrow: "Laravel Scout · Auto Re-index · Relations"
+  desc: "Keep related Laravel Scout search indexes fresh automatically."
+  requires: "PHP ^8.4"
+  laravel: "12.x / 13.x"
+  licence: MIT
 ---
 
 # Introduction
 
-Automatically re-index Scout-searchable related models when an Eloquent
-model is saved or deleted.
+This package keeps your Laravel Scout search index up to date automatically.
 
-When a parent model changes (e.g. an `Author`), its related Searchable
-models (e.g. `Post`) are automatically queued for re-indexing, keeping your
-search index consistent without any manual intervention.
+When you save or delete a model, this package can also re-index its related
+models — the ones connected to it through an Eloquent relationship. For
+example, if you save an `Author`, this package automatically queues that
+author's `Post` records for re-indexing. You don't need to write any extra
+code to keep the two in sync.
 
 ## Requirements
 

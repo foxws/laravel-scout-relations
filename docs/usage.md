@@ -1,12 +1,13 @@
 ---
-sidebar_position: 3
+section: Usage
+order: 1
 ---
 
 # Usage
 
-Add the `HasSearchableRelations` trait to any Eloquent model whose changes
-should trigger re-indexing of related models. Then override
-`searchableRelations()` to return the relationship names to watch.
+To keep a model's related records in sync, add the `HasSearchableRelations`
+trait to it. Then add a `searchableRelations()` method that lists the names
+of the relationships you want to watch.
 
 ```php
 use Foxws\ScoutRelations\Concerns\HasSearchableRelations;
@@ -34,7 +35,8 @@ class Author extends Model
 }
 ```
 
-The related `Post` model must use Laravel Scout's `Searchable` trait:
+The related model — `Post` in this example — must use Laravel Scout's own
+`Searchable` trait, just like any other searchable model:
 
 ```php
 use Illuminate\Database\Eloquent\Model;
@@ -55,19 +57,22 @@ class Post extends Model
 }
 ```
 
-Now whenever an `Author` is saved with changes or deleted, all of its `Post`
-records are automatically re-indexed.
+With this in place, saving an `Author` with changes, or deleting one,
+automatically re-indexes all of that author's `Post` records.
 
 ## How it works
 
-The trait hooks into Eloquent's `saved` and `deleted` model events:
+The `HasSearchableRelations` trait listens to two Eloquent model events:
 
-- **`saved`** — re-indexes relations only when `wasChanged()` is `true`, avoiding unnecessary indexing on no-op saves.
-- **`deleted`** — re-indexes relations unconditionally so the search index reflects the parent's removal.
+| Event | What happens |
+| --- | --- |
+| `saved` | Related models are re-indexed only if the model actually changed (`wasChanged()` is `true`). Saves with no real changes are skipped. |
+| `deleted` | Related models are always re-indexed, so the search index reflects that the parent is gone. |
 
-Re-indexing is performed in chunks via `chunkById`. If the related model
-defines `makeAllSearchableUsing()`, it is applied to the chunk query,
-preventing N+1 queries.
+Related records are re-indexed in chunks, using `chunkById`. If the related
+model defines its own `makeAllSearchableUsing()` method, that method is used
+while building each chunk, which avoids extra N+1 queries.
 
-A per-class re-entry guard prevents infinite cascades when mutual
-relationships exist.
+The package also guards against infinite loops: if two models watch each
+other's relationships, a re-index on one side won't keep triggering the
+other back and forth forever.
