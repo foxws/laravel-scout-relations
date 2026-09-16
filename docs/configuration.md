@@ -1,5 +1,6 @@
 ---
-sidebar_position: 4
+section: Reference
+order: 1
 ---
 
 # Configuration
@@ -10,10 +11,10 @@ Publish the config file with:
 php artisan vendor:publish --tag="scout-relations-config"
 ```
 
-Available options in `config/scout-relations.php`:
+This creates `config/scout-relations.php`, with the following options:
 
 | Key | Env variable | Default | Description |
 |---|---|---|---|
-| `enabled` | `SCOUT_RELATIONS_ENABLED` | `true` | Disable all automatic relation syncing |
-| `chunk.searchable` | `SCOUT_RELATIONS_CHUNK_SEARCHABLE` | `500` | Chunk size for `searchable()` calls |
-| `chunk.unsearchable` | `SCOUT_RELATIONS_CHUNK_UNSEARCHABLE` | `500` | Chunk size reserved for future use |
+| `enabled` | `SCOUT_RELATIONS_ENABLED` | `true` | Turns automatic relation syncing on or off. |
+| `chunk.searchable` | `SCOUT_RELATIONS_CHUNK_SEARCHABLE` | `500` | How many records are processed at a time when calling `searchable()`. |
+| `chunk.unsearchable` | `SCOUT_RELATIONS_CHUNK_UNSEARCHABLE` | `500` | Chunk size reserved for future use. |
