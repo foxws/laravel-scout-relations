@@ -2,6 +2,20 @@
 
 All notable changes to `laravel-scout-relations` will be documented in this file.
 
+## 1.0.1 - 2026-09-16
+
+### What's Changed
+
+* Bump actions/upload-pages-artifact from 3 to 5 by @dependabot[bot] in https://github.com/foxws/laravel-scout-relations/pull/11
+* Bump actions/deploy-pages from 4 to 5 by @dependabot[bot] in https://github.com/foxws/laravel-scout-relations/pull/10
+* Bump actions/setup-node from 4 to 7 by @dependabot[bot] in https://github.com/foxws/laravel-scout-relations/pull/9
+* Bump actions/checkout from 4 to 7 by @dependabot[bot] in https://github.com/foxws/laravel-scout-relations/pull/8
+* Bump pnpm/action-setup from 4 to 6 by @dependabot[bot] in https://github.com/foxws/laravel-scout-relations/pull/7
+* Bump react from 19.2.8 to 19.3.0 in /website by @dependabot[bot] in https://github.com/foxws/laravel-scout-relations/pull/12
+* Migrate docs to laravel-docs front matter and simplify prose by @francoism90 in https://github.com/foxws/laravel-scout-relations/pull/13
+
+**Full Changelog**: https://github.com/foxws/laravel-scout-relations/compare/1.0.0...1.0.1
+
 ## 1.0.0 - 2026-07-27
 
 ### What's Changed
