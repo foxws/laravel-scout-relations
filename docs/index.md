@@ -2,6 +2,7 @@
 title: Introduction
 metadata:
   role: Search
+  group: search
   eyebrow: "Laravel Scout · Auto Re-index · Relations"
   desc: "Keep related Laravel Scout search indexes fresh automatically."
   requires: "PHP ^8.4"
