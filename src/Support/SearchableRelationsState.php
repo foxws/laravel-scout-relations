@@ -13,16 +13,25 @@ class SearchableRelationsState
      */
     private array $reindexing = [];
 
+    /**
+     * @param  class-string  $class
+     */
     public function isReindexing(string $class): bool
     {
         return array_key_exists($class, $this->reindexing);
     }
 
+    /**
+     * @param  class-string  $class
+     */
     public function markReindexing(string $class): void
     {
         $this->reindexing[$class] = true;
     }
 
+    /**
+     * @param  class-string  $class
+     */
     public function unmarkReindexing(string $class): void
     {
         unset($this->reindexing[$class]);

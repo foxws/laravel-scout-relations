@@ -6,6 +6,7 @@ namespace Foxws\ScoutRelations\Commands;
 
 use Foxws\ScoutRelations\Concerns\HasSearchableRelations;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
 use Laravel\Scout\Searchable;
 
@@ -18,6 +19,12 @@ class ScoutRelationsCommand extends Command
     public function handle(): int
     {
         $model = $this->argument('model');
+
+        if (! is_string($model)) {
+            $this->error('Pass the model class to re-index, e.g. "App\\Models\\Author".');
+
+            return self::FAILURE;
+        }
 
         if (! class_exists($model)) {
             $this->error("Class [{$model}] does not exist.");
@@ -65,18 +72,22 @@ class ScoutRelationsCommand extends Command
      */
     protected function searchableRelatedClasses(object $instance): array
     {
+        if (! method_exists($instance, 'searchableRelations')) {
+            return [];
+        }
+
         $classes = [];
 
         foreach ($instance->searchableRelations() as $relation) {
             $related = $instance->{$relation}()->getRelated();
 
-            if (! in_array(Searchable::class, class_uses_recursive($related))) {
+            if (! $related instanceof Model || ! in_array(Searchable::class, class_uses_recursive($related))) {
                 continue;
             }
 
-            $classes[get_class($related)] = true;
+            $classes[] = $related::class;
         }
 
-        return array_keys($classes);
+        return array_values(array_unique($classes));
     }
 }
