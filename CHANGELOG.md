@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-scout-relations` will be documented in this file.
 
+## 1.0.2 - 2026-10-02
+
+### What's Changed
+
+* docs: add the foxws.nl homepage group, a hero lead and a clearer introduction by @francoism90 in https://github.com/foxws/laravel-scout-relations/pull/14
+* Raise PHPStan to level 8 by @francoism90 in https://github.com/foxws/laravel-scout-relations/pull/15
+
+**Full Changelog**: https://github.com/foxws/laravel-scout-relations/compare/1.0.1...1.0.2
+
 ## 1.0.1 - 2026-09-16
 
 ### What's Changed
