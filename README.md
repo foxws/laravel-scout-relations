@@ -113,7 +113,7 @@ To manually force re-indexing of all relations for a model (ignoring the `enable
 php artisan scout:index-relations "App\Models\Author"
 ```
 
-This chunks through every record of the given model and calls `reindexSearchableRelations()` on each, with a progress bar.
+This runs Scout's `makeAllSearchable()` once for each distinct searchable model class referenced by the model's `searchableRelations()`, so a relation shared by many records is only imported once.
 
 ## Testing
 
