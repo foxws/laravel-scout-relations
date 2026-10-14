@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-scout-relations` will be documented in this file.
 
+## 1.0.4 - 2026-10-14
+
+### What's Changed
+
+* Add Laravel Boost tip to README and docs by @francoism90 in https://github.com/foxws/laravel-scout-relations/pull/17
+
+**Full Changelog**: https://github.com/foxws/laravel-scout-relations/compare/1.0.3...1.0.4
+
 ## 1.0.3 - 2026-10-13
 
 ### What's Changed
