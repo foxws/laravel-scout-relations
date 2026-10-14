@@ -25,6 +25,16 @@ Install the package via Composer:
 composer require foxws/laravel-scout-relations
 ```
 
+> [!TIP]
+> Let your AI agent do the hard parts. This package ships a [Laravel Boost](https://laravel.com/docs/boost) skill, `scout-relations-development`, that teaches your agent how to install, configure and use Laravel Scout Relations. Install Boost and select the skill when prompted:
+>
+> ```bash
+> composer require laravel/boost --dev
+> php artisan boost:install
+> ```
+>
+> Already using Boost? Run `php artisan boost:update --discover` to pick up the skill. Then just ask, for example: *"Re-index an author's posts in Scout whenever the author is saved."*
+
 ## Usage
 
 Add the `HasSearchableRelations` trait to any Eloquent model whose changes should trigger re-indexing of related models. Then override `searchableRelations()` to return the relationship names to watch.
