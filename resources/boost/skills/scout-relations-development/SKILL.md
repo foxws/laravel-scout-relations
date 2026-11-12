@@ -100,7 +100,7 @@ php artisan scout:index-relations "App\Models\Author"
 ## Rules
 
 - Don't add your own `saved`/`deleted` observers to re-index the same relations; the trait already does.
-- `enabled` is read when the model class **boots**, once per process. Changing it at runtime (or in a test after the model was used) has no effect until the models are booted again — in tests, set it before the first use or call `Model::clearBootedModels()`.
+- `enabled` is read each time a model is saved or deleted, so it can be changed at runtime (e.g. `config(['scout-relations.enabled' => false])` around a bulk import).
 - Updates that skip model events (`Author::query()->update()`, `saveQuietly()`, database `ON DELETE CASCADE`) don't trigger re-indexing. Call `reindexSearchableRelations()` or the Artisan command afterwards. Rows removed by a database cascade also stay in the search index, since Scout never sees them deleted.
 - Re-indexing runs synchronously inside the parent's save or delete. Enable `scout.queue` so `searchable()` dispatches jobs instead of indexing in the request.
 - Mutual relations are safe: a per-class guard (scoped per request, so safe under Octane) stops a cascade from re-entering a class that is already re-indexing.

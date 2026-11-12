@@ -14,18 +14,16 @@ trait HasSearchableRelations
 {
     public static function bootHasSearchableRelations(): void
     {
-        if (! Config::boolean('scout-relations.enabled', true)) {
-            return;
-        }
-
+        // Checked when the events fire, not here: a model boots once per process
+        // (Octane, queue workers), so config changed afterwards must still apply.
         static::saved(function (Model $model): void {
-            if ($model->wasChanged() && $model->shouldReindexSearchableRelations()) {
+            if (Config::boolean('scout-relations.enabled', true) && $model->wasChanged() && $model->shouldReindexSearchableRelations()) {
                 $model->reindexSearchableRelations();
             }
         });
 
         static::deleted(function (Model $model): void {
-            if ($model->shouldReindexSearchableRelations()) {
+            if (Config::boolean('scout-relations.enabled', true) && $model->shouldReindexSearchableRelations()) {
                 $model->reindexSearchableRelations();
             }
         });
