@@ -5,7 +5,7 @@ metadata:
   group: search
   eyebrow: "Laravel Scout · Auto Re-index · Relations"
   desc: "Keep related Laravel Scout search indexes fresh automatically."
-  requires: "PHP ^8.4"
+  requires: "PHP ^8.5"
   laravel: "12.x / 13.x"
   licence: MIT
 ---
@@ -22,7 +22,7 @@ code to keep the two in sync.
 
 ## Requirements
 
-- PHP 8.4+
+- PHP 8.5+
 - Laravel 12+
 - [Laravel Scout](https://laravel.com/docs/scout)
 
