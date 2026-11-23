@@ -12,4 +12,9 @@ class Post extends Model
     use Searchable;
 
     protected $guarded = [];
+
+    public function shouldBeSearchable(): bool
+    {
+        return ! $this->draft;
+    }
 }

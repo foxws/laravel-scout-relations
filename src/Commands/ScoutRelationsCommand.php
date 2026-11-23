@@ -7,6 +7,8 @@ namespace Foxws\ScoutRelations\Commands;
 use Foxws\ScoutRelations\Concerns\HasSearchableRelations;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Config;
 use Laravel\Scout\Searchable;
 
@@ -78,16 +80,37 @@ class ScoutRelationsCommand extends Command
 
         $classes = [];
 
-        foreach ($instance->searchableRelations() as $relation) {
-            $related = $instance->{$relation}()->getRelated();
+        foreach ($instance->searchableRelations() as $name) {
+            $relation = $instance->{$name}();
 
-            if (! $related instanceof Model || ! in_array(Searchable::class, class_uses_recursive($related))) {
-                continue;
+            $related = $relation instanceof MorphTo && $instance instanceof Model
+                ? $this->morphedClasses($instance, $relation)
+                : [$relation->getRelated()::class];
+
+            foreach ($related as $class) {
+                if (is_string($class) && is_a($class, Model::class, true) && in_array(Searchable::class, class_uses_recursive($class), true)) {
+                    $classes[] = $class;
+                }
             }
-
-            $classes[] = $related::class;
         }
 
         return array_values(array_unique($classes));
+    }
+
+    /**
+     * A morphTo relation has no single related class: look up the types its
+     * records point to.
+     *
+     * @param  MorphTo<Model, Model>  $relation
+     * @return array<int, string>
+     */
+    protected function morphedClasses(Model $instance, MorphTo $relation): array
+    {
+        return $instance->newQuery()
+            ->whereNotNull($relation->getMorphType())
+            ->distinct()
+            ->pluck($relation->getMorphType())
+            ->map(fn (mixed $type): string => Relation::getMorphedModel((string) $type) ?? (string) $type)
+            ->all();
     }
 }
