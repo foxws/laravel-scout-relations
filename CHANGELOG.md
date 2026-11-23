@@ -2,6 +2,30 @@
 
 All notable changes to `laravel-scout-relations` will be documented in this file.
 
+## 2.0.0 - 2026-11-23
+
+This release requires PHP 8.5 or newer and Laravel 13. PHP 8.4 and Laravel 12 are no longer supported, and PHP 8.6 is now tested in CI. Stay on the previous major version if you still run PHP 8.4 or Laravel 12.
+
+Re-indexing related models now behaves like Scout's own observer:
+
+- The related keys are read before a delete, so related models whose rows the database cascades away (such as a pivot table with `ON DELETE CASCADE`) are re-indexed too.
+- With `scout.after_commit` enabled, re-indexing inside a transaction waits for the commit, and is skipped on a rollback.
+- Related models whose `shouldBeSearchable()` returns `false` are removed from the index instead of indexed.
+- Ordered relations (such as `hasMany()->latest()`) no longer skip records. `makeAllSearchableUsing()` is applied as a scope, so an `orWhere()` in it can't reach other parents' records or loop, and joins work.
+- `withoutSyncingToSearch()` and `scout.soft_delete` are honoured, a chunk size that isn't positive uses `500`, and a later save without changes no longer re-indexes.
+- `scout:index-relations` imports the classes a `morphTo` relation points to.
+
+**Upgrading:** related models that aren't searchable now get a `RemoveFromSearch` job, and with `scout.after_commit` enabled re-indexing happens after the commit. Read the parent null-safely in `toSearchableArray()` (`$this->author?->name`), as related models are re-indexed after it's deleted.
+
+### What's Changed
+
+* Drop PHP 8.4 and add PHP 8.6 by @francoism90 in https://github.com/foxws/laravel-scout-relations/pull/19
+* Drop Laravel 12, which Pest 5 doesn't support by @francoism90 in https://github.com/foxws/laravel-scout-relations/pull/20
+* Remove auto-merge and limit the workflows by @francoism90 in https://github.com/foxws/laravel-scout-relations/pull/21
+* Reindex related models reliably by @francoism90 in https://github.com/foxws/laravel-scout-relations/pull/22
+
+**Full Changelog**: https://github.com/foxws/laravel-scout-relations/compare/1.0.4...2.0.0
+
 ## 1.0.4 - 2026-10-14
 
 ### What's Changed
