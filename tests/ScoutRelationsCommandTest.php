@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Foxws\ScoutRelations\Tests\Fixtures\Author;
+use Foxws\ScoutRelations\Tests\Fixtures\Note;
 use Foxws\ScoutRelations\Tests\Fixtures\Post;
 use Foxws\ScoutRelations\Tests\Fixtures\TaggedAuthor;
 use Illuminate\Database\Schema\Blueprint;
@@ -28,6 +29,12 @@ beforeEach(function () {
         $table->timestamps();
     });
 
+    Schema::create('notes', function (Blueprint $table) {
+        $table->id();
+        $table->nullableMorphs('notable');
+        $table->timestamps();
+    });
+
     Schema::create('author_tag', function (Blueprint $table) {
         $table->unsignedBigInteger('author_id');
         $table->unsignedBigInteger('tag_id');
@@ -35,6 +42,7 @@ beforeEach(function () {
 });
 
 afterEach(function () {
+    Schema::dropIfExists('notes');
     Schema::dropIfExists('author_tag');
     Schema::dropIfExists('tags');
     Schema::dropIfExists('posts');
@@ -93,4 +101,18 @@ it('re-indexes a shared many-to-many relation only once across owning records', 
     // The tag is attached to two authors, but re-indexing dedupes by
     // related class, so it must only be pushed to the search engine once.
     Queue::assertPushed(MakeSearchable::class, 1);
+});
+
+it('re-indexes the classes a morphTo relation points to', function () {
+    config(['scout.queue' => true]);
+    Queue::fake();
+
+    $authorId = DB::table('authors')->insertGetId(['created_at' => now(), 'updated_at' => now()]);
+    $postId = DB::table('posts')->insertGetId(['author_id' => $authorId, 'created_at' => now(), 'updated_at' => now()]);
+    DB::table('notes')->insert(['notable_type' => Post::class, 'notable_id' => $postId]);
+
+    $this->artisan('scout:index-relations', ['model' => Note::class])
+        ->assertSuccessful();
+
+    Queue::assertPushed(MakeSearchable::class, fn (MakeSearchable $job) => $job->models->first() instanceof Post);
 });

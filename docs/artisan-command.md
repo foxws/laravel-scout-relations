@@ -16,7 +16,8 @@ php artisan scout:index-relations "App\Models\Author"
 The command looks up the related model classes of the given model's
 `searchableRelations()` and runs Scout's `makeAllSearchable()` once for each
 distinct class that uses `Searchable`. Relations whose related model isn't
-searchable are skipped.
+searchable are skipped. For a `morphTo` relation, those are the classes its
+records point to.
 
 Because each related class is imported once, a relation shared by many
 records (such as a `belongsToMany`) isn't pushed to the search engine more
